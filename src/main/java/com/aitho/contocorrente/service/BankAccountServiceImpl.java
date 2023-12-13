@@ -23,7 +23,7 @@ public class BankAccountServiceImpl implements BankAccountService{
     public void doCredit(Long bankAccountId, Double amount) {
         BankAccount bankAccount = repository.getReferenceById(bankAccountId);
         bankAccount.setBalance(bankAccount.getBalance() + amount);
-        repository.save(bankAccount);
+        bankAccount = repository.save(bankAccount);
         transactionService.create(bankAccount, amount, OperationType.CREDIT);
     }
 

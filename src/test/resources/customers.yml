@@ -1,0 +1,13 @@
+customer:
+  - id: 1
+    first_name: "Michael"
+    last_name: "Spinello"
+    tax_code: "SPNMHL94L04I441Q"
+  - id: 2
+    first_name: "Mario"
+    last_name: "Rossi"
+    tax_code: "RSSMRA74D22A001Q"
+  - id: 3
+    first_name: "Giuseppe"
+    last_name: "Verdi"
+    tax_code: "1234567890123456"

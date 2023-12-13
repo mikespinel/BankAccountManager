@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,5 +32,10 @@ public class CustomerServiceImpl implements CustomerService{
         }else{
             throw new EntityNotFoundException("Impossibile trovare utente con id " + customerId);
         }
+    }
+
+    @Override
+    public Optional<Customer> findById(long l) {
+        return repository.findById(l);
     }
 }
