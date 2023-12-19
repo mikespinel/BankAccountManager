@@ -1,4 +1,4 @@
-package com.aitho.contocorrente;
+package com.aitho.contocorrente.controller;
 
 import com.aitho.contocorrente.dto.TransactionResultsDto;
 import com.aitho.contocorrente.model.OperationType;
@@ -6,10 +6,10 @@ import com.aitho.contocorrente.service.TransactionService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
@@ -21,8 +21,8 @@ import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@WebMvcTest(TransactionController.class)
+@ActiveProfiles("test")
 class TransactionControllerTest {
 
     @MockBean

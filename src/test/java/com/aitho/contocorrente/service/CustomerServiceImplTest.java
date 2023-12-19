@@ -1,29 +1,41 @@
-package com.aitho.contocorrente;
+package com.aitho.contocorrente.service;
 
+import com.aitho.contocorrente.mapper.CustomerMapper;
 import com.aitho.contocorrente.model.BankAccount;
 import com.aitho.contocorrente.model.Customer;
 import com.aitho.contocorrente.repository.CustomerRepository;
-import com.aitho.contocorrente.service.CustomerService;
+import org.junit.Before;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashSet;
 import java.util.List;
 
 import static org.mockito.Mockito.doReturn;
 
-@SpringBootTest
-class CustomerServiceTest {
+@ExtendWith(value = MockitoExtension.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class CustomerServiceImplTest {
 
-    @Autowired
-    private CustomerService service;
-
-    @MockBean
+    @Mock
     private CustomerRepository repository;
+
+    @Mock
+    private CustomerMapper mapper;
+
+    @InjectMocks
+    private CustomerServiceImpl service;
+    @Before
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
 
     @Test
     @DisplayName("Test getBankAccountList Success")

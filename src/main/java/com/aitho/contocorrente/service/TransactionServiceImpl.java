@@ -25,10 +25,8 @@ public class TransactionServiceImpl implements TransactionService{
 
     @Override
     public List<TransactionResultsDto> getLastMovements(Long bankAccountId) {
-        List<TransactionResultsDto> results = new ArrayList<>();
         List<Transaction> transactions = repository.getLastMovements(bankAccountId);
-        transactions.forEach(t -> results.add(mapper.toResultsDto(t)));
-        return results;
+        return mapper.toResultsDtos(transactions);
     }
 
     @Override

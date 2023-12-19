@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS customer (
-	id integer NOT NULL,
+	id bigserial NOT NULL,
 	first_name varchar(255) NOT NULL,
 	last_name varchar(255) NOT NULL,
 	tax_code varchar(255) NULL,
