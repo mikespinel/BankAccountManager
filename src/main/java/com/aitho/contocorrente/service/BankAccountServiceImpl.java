@@ -20,30 +20,43 @@ public class BankAccountServiceImpl implements BankAccountService{
     }
 
     @Override
-    public void doCredit(Long bankAccountId, Double amount) {
+    public void doCredit(String taxCode, Long bankAccountId, Double amount) {
         BankAccount bankAccount = repository.getReferenceById(bankAccountId);
-        bankAccount.setBalance(bankAccount.getBalance() + amount);
-        bankAccount = repository.save(bankAccount);
-        transactionService.create(bankAccount, amount, OperationType.CREDIT);
-    }
-
-    @Override
-    public void doDebit(Long bankAccountId, Double amount) {
-        BankAccount bankAccount = repository.getReferenceById(bankAccountId);
-        if(amount < 0 || bankAccount.getBalance() < amount){
-            throw new BankAccountException("Impossibile prelevare la somma richiesta in quanto supera il saldo dispnibile");
-        }
-        bankAccount.setBalance(bankAccount.getBalance() - amount);
-        repository.save(bankAccount);
-        transactionService.create(bankAccount, amount, OperationType.DEBIT);
-    }
-
-    @Override
-    public Double getBalance(Long bankAccountId) {
-        if(repository.existsById(bankAccountId)){
-            return repository.getReferenceById(bankAccountId).getBalance();
+        if(bankAccount.getCustomer().getTaxCode().equalsIgnoreCase(taxCode)){
+            bankAccount.setBalance(bankAccount.getBalance() + amount);
+            bankAccount = repository.save(bankAccount);
+            transactionService.create(bankAccount, amount, OperationType.CREDIT);
         }else{
-            throw new EntityNotFoundException("Conto corrente non trovato");
+            throw new BankAccountException("Non hai l'autorizzazione per effettuare transazioni su questo conto.");
+        }
+    }
+
+    @Override
+    public void doDebit(String taxCode, Long bankAccountId, Double amount) {
+        BankAccount bankAccount = repository.getReferenceById(bankAccountId);
+        if(bankAccount.getCustomer().getTaxCode().equalsIgnoreCase(taxCode)){
+            if(amount < 0 || bankAccount.getBalance() < amount){
+                throw new BankAccountException("Impossibile prelevare la somma richiesta in quanto supera il saldo dispnibile");
+            }
+            bankAccount.setBalance(bankAccount.getBalance() - amount);
+            repository.save(bankAccount);
+            transactionService.create(bankAccount, amount, OperationType.DEBIT);
+        }else{
+            throw new BankAccountException("Non hai l'autorizzazione per effettuare transazioni su questo conto.");
+        }
+    }
+
+    @Override
+    public Double getBalance(String taxCode, Long bankAccountId) {
+        BankAccount bankAccount = repository.getReferenceById(bankAccountId);
+        if(bankAccount.getCustomer().getTaxCode().equalsIgnoreCase(taxCode)){
+            if(repository.existsById(bankAccountId)){
+                return repository.getReferenceById(bankAccountId).getBalance();
+            }else{
+                throw new EntityNotFoundException("Conto corrente non trovato");
+            }
+        }else{
+            throw new BankAccountException("Non hai l'autorizzazione per accedere a questo conto.");
         }
     }
 }

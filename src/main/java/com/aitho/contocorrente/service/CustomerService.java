@@ -10,4 +10,6 @@ public interface CustomerService {
     List<Long> getBankAccountList(Long customerId);
 
     Optional<Customer> findById(long l);
+
+    Customer save(Customer customer);
 }

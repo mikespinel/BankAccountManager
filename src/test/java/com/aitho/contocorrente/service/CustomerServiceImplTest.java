@@ -41,7 +41,7 @@ class CustomerServiceImplTest {
     @DisplayName("Test getBankAccountList Success")
     void testGetBankAccountList(){
         // Setup our mock repository
-        Customer customer = new Customer(10L, "Giacomo", "Leopardi", "90082020638", new HashSet<>());
+        Customer customer = new Customer(10L, "Giacomo", "Leopardi", "90082020638", "1234", new HashSet<>());
         BankAccount bankAccount = new BankAccount(7L, 1000.00, 10L, customer, new HashSet<>());
         customer.getBankAccounts().add(bankAccount);
 
