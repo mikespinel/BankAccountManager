@@ -2,9 +2,20 @@ package com.aitho.contocorrente.service;
 
 import com.aitho.contocorrente.dto.request.LoginRequest;
 import com.aitho.contocorrente.dto.request.SignupRequest;
+import com.aitho.contocorrente.dto.request.TokenRefreshRequest;
 import com.aitho.contocorrente.dto.response.JwtResponse;
+import com.aitho.contocorrente.dto.response.MessageResponse;
+import com.aitho.contocorrente.dto.response.TokenRefreshResponse;
+import com.aitho.contocorrente.exception.TokenRefreshException;
+import com.aitho.contocorrente.model.Customer;
+import com.aitho.contocorrente.model.Role;
+import com.aitho.contocorrente.model.RoleEnum;
+import com.aitho.contocorrente.repository.CustomerRepository;
+import com.aitho.contocorrente.repository.RoleRepository;
 import com.aitho.contocorrente.security.UserDetailsImpl;
 import com.aitho.contocorrente.util.JwtUtil;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.proc.BadJOSEException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -13,29 +24,36 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.text.ParseException;
+import java.util.*;
 import java.util.stream.Collectors;
-import org.springframework.security.core.userdetails.User;
+
 @Service
 public class AuthServiceImpl implements AuthService {
 
     private final AuthenticationManager authenticationManager;
-    private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder encoder;
+    private final CustomerRepository customerRepository;
+    private final RoleRepository roleRepository;
 
-    public AuthServiceImpl(AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder) {
+    public AuthServiceImpl(
+            AuthenticationManager authenticationManager,
+            PasswordEncoder passwordEncoder,
+            CustomerRepository customerRepository,
+            RoleRepository roleRepository
+    ) {
         this.authenticationManager = authenticationManager;
-        this.passwordEncoder = passwordEncoder;
+        this.encoder = passwordEncoder;
+        this.customerRepository = customerRepository;
+        this.roleRepository = roleRepository;
     }
 
     @Override
-    public JwtResponse signin(LoginRequest loginRequest, HttpServletRequest request){
+    public JwtResponse signin(LoginRequest loginRequest, HttpServletRequest request) {
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
@@ -50,55 +68,81 @@ public class AuthServiceImpl implements AuthService {
 
         String refreshToken = JwtUtil.createRefreshToken(userDetails.getUsername());
 
-        return new JwtResponse(jwt, refreshToken, userDetails.getId(),
+        return new JwtResponse(jwt, refreshToken,
                 userDetails.getUsername(), userDetails.getEmail(), roles);
     }
-    /*public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
-        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
+
+    @Override
+    public ResponseEntity<?> registerCustomer(@Valid @RequestBody SignupRequest signUpRequest) {
+        if (Boolean.TRUE.equals(customerRepository.existsByUsername(signUpRequest.getUsername()))) {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
         }
 
-        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+        if (Boolean.TRUE.equals(customerRepository.existsByEmail(signUpRequest.getEmail()))) {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
         }
 
         // Create new user's account
-        User user = new User(signUpRequest.getUsername(), signUpRequest.getEmail(),
+        Customer customer = new Customer(
+                signUpRequest.getFirstName(),
+                signUpRequest.getLastName(),
+                signUpRequest.getTaxCode(),
+                signUpRequest.getUsername(),
+                signUpRequest.getEmail(),
                 encoder.encode(signUpRequest.getPassword()));
 
         Set<String> strRoles = signUpRequest.getRole();
         Set<Role> roles = new HashSet<>();
 
         if (strRoles == null) {
-            Role userRole = roleRepository.findByName(ERole.ROLE_USER)
+            Role userRole = roleRepository.findByName(RoleEnum.ROLE_USER)
                     .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
             roles.add(userRole);
         } else {
             strRoles.forEach(role -> {
                 switch (role) {
                     case "admin":
-                        Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
+                        Role adminRole = roleRepository.findByName(RoleEnum.ROLE_ADMIN)
                                 .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
                         roles.add(adminRole);
 
                         break;
                     case "mod":
-                        Role modRole = roleRepository.findByName(ERole.ROLE_MODERATOR)
+                        Role modRole = roleRepository.findByName(RoleEnum.ROLE_MODERATOR)
                                 .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
                         roles.add(modRole);
 
                         break;
                     default:
-                        Role userRole = roleRepository.findByName(ERole.ROLE_USER)
+                        Role userRole = roleRepository.findByName(RoleEnum.ROLE_USER)
                                 .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
                         roles.add(userRole);
                 }
             });
         }
 
-        user.setRoles(roles);
-        userRepository.save(user);
+        customer.setRoles(roles);
+        customerRepository.save(customer);
 
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
-    }*/
+    }
+
+    @Override
+    public ResponseEntity<?> refreshToken(TokenRefreshRequest request, String issuer) throws BadJOSEException, ParseException, JOSEException {
+        String refreshToken = request.getRefreshToken();
+
+        JwtUtil.verifyExpiration(refreshToken);
+        UsernamePasswordAuthenticationToken authenticationToken = JwtUtil.parseToken(refreshToken);
+        String username = authenticationToken.getName();
+        Optional<Customer> customer = customerRepository.findByUsername(username);
+        if(customer.isPresent()){
+            List<String> roles = customer.get().getRoles().stream().map(role -> role.getName().name()).collect(Collectors.toList());
+            String accessToken = JwtUtil.createAccessToken(username, issuer, roles);
+
+            return ResponseEntity.ok(new TokenRefreshResponse(accessToken, refreshToken));
+        }else{
+            throw new TokenRefreshException(refreshToken, "User not found");
+        }
+
+    }
 }

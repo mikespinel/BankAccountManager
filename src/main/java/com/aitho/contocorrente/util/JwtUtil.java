@@ -1,5 +1,6 @@
 package com.aitho.contocorrente.util;
 
+import com.aitho.contocorrente.exception.TokenRefreshException;
 import com.aitho.contocorrente.security.UserDetailsImpl;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
@@ -100,5 +101,12 @@ public abstract class JwtUtil {
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
         return new UsernamePasswordAuthenticationToken(username, null, authorities);
+    }
+
+    public static void verifyExpiration(String refreshToken) throws ParseException {
+        SignedJWT signedJWT = SignedJWT.parse(refreshToken);
+        if(signedJWT.getJWTClaimsSet().getExpirationTime().compareTo(Date.from(Instant.now())) < 0){
+            throw new TokenRefreshException(refreshToken, "Refresh token was expired. Please make a new signin request");
+        }
     }
 }

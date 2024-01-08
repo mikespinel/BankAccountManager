@@ -2,8 +2,10 @@ package com.aitho.contocorrente.service;
 
 import com.aitho.contocorrente.model.BankAccount;
 import com.aitho.contocorrente.model.Customer;
+import com.aitho.contocorrente.model.Role;
 import com.aitho.contocorrente.model.RoleEnum;
 import com.aitho.contocorrente.repository.CustomerRepository;
+import com.aitho.contocorrente.repository.RoleRepository;
 import com.aitho.contocorrente.security.UserDetailsImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -28,13 +30,15 @@ public class CustomerServiceImpl implements CustomerService, UserDetailsService 
 
     private final CustomerRepository repository;
     private final PasswordEncoder passwordEncoder;
+    private final RoleRepository roleRepository;
 
     private static final String USER_NOT_FOUND_MESSAGE = "Utente con codice fiscale %s non trovato";
 
 
-    public CustomerServiceImpl(CustomerRepository repository, PasswordEncoder passwordEncoder) {
+    public CustomerServiceImpl(CustomerRepository repository, PasswordEncoder passwordEncoder, RoleRepository roleRepository) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
+        this.roleRepository = roleRepository;
     }
 
     @Override
@@ -59,16 +63,17 @@ public class CustomerServiceImpl implements CustomerService, UserDetailsService 
 
     @Transactional(readOnly = true)
     @Override
-    public UserDetailsImpl loadUserByUsername(String taxCode) throws UsernameNotFoundException {
-        Customer customer = repository.selectCustomerByTaxCode(taxCode);
-        if(customer == null) {
-            String message = String.format(USER_NOT_FOUND_MESSAGE, taxCode);
+    public UserDetailsImpl loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<Customer> optionalCustomer = repository.findByUsername(username);
+        if(!optionalCustomer.isPresent()) {
+            String message = String.format(USER_NOT_FOUND_MESSAGE, username);
             log.error(message);
             throw new UsernameNotFoundException(message);
         } else {
-            log.debug("User found in the database: {}", taxCode);
-            Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
-            authorities.add(new SimpleGrantedAuthority(RoleEnum.ROLE_USER.name()));
+            log.debug("User found in the database: {}", username);
+            Customer customer = optionalCustomer.get();
+            /*customer.getRoles().add(roleRepository.findByName(RoleEnum.ROLE_USER)
+                    .orElseThrow(() -> new RuntimeException("Error: Role is not found.")));*/
             return UserDetailsImpl.build(customer);
         }
     }

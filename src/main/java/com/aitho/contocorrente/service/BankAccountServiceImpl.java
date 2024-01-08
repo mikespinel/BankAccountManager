@@ -20,9 +20,9 @@ public class BankAccountServiceImpl implements BankAccountService{
     }
 
     @Override
-    public void doCredit(String taxCode, Long bankAccountId, Double amount) {
+    public void doCredit(String username, Long bankAccountId, Double amount) {
         BankAccount bankAccount = repository.getReferenceById(bankAccountId);
-        if(bankAccount.getCustomer().getTaxCode().equalsIgnoreCase(taxCode)){
+        if(bankAccount.getCustomer().getUsername().equalsIgnoreCase(username)){
             bankAccount.setBalance(bankAccount.getBalance() + amount);
             bankAccount = repository.save(bankAccount);
             transactionService.create(bankAccount, amount, OperationType.CREDIT);
@@ -32,9 +32,9 @@ public class BankAccountServiceImpl implements BankAccountService{
     }
 
     @Override
-    public void doDebit(String taxCode, Long bankAccountId, Double amount) {
+    public void doDebit(String username, Long bankAccountId, Double amount) {
         BankAccount bankAccount = repository.getReferenceById(bankAccountId);
-        if(bankAccount.getCustomer().getTaxCode().equalsIgnoreCase(taxCode)){
+        if(bankAccount.getCustomer().getUsername().equalsIgnoreCase(username)){
             if(amount < 0 || bankAccount.getBalance() < amount){
                 throw new BankAccountException("Impossibile prelevare la somma richiesta in quanto supera il saldo dispnibile");
             }
@@ -47,9 +47,9 @@ public class BankAccountServiceImpl implements BankAccountService{
     }
 
     @Override
-    public Double getBalance(String taxCode, Long bankAccountId) {
+    public Double getBalance(String username, Long bankAccountId) {
         BankAccount bankAccount = repository.getReferenceById(bankAccountId);
-        if(bankAccount.getCustomer().getTaxCode().equalsIgnoreCase(taxCode)){
+        if(bankAccount.getCustomer().getUsername().equalsIgnoreCase(username)){
             if(repository.existsById(bankAccountId)){
                 return repository.getReferenceById(bankAccountId).getBalance();
             }else{

@@ -9,13 +9,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @MappedSuperclass
 public abstract class User {
-
-    @Id
-    private Long id;
 
     @Column(name = "username", nullable = false, unique = true)
     private String username;

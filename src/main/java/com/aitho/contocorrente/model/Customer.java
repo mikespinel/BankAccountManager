@@ -15,6 +15,15 @@ import java.util.Set;
 @NoArgsConstructor
 public class Customer extends User{
 
+    public Customer(String firstName, String lastName, String taxCode, String username, String email, String password){
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.taxCode = taxCode;
+        super.setUsername(username);
+        super.setEmail(email);
+        super.setPassword(password);
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
