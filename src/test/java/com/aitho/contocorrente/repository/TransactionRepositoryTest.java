@@ -2,7 +2,7 @@ package com.aitho.contocorrente.repository;
 
 import com.aitho.contocorrente.ContocorrenteJpaConfig;
 import com.aitho.contocorrente.model.BankAccount;
-import com.aitho.contocorrente.model.OperationType;
+import com.aitho.contocorrente.enums.OperationType;
 import com.aitho.contocorrente.model.Transaction;
 import com.aitho.contocorrente.model.Customer;
 import org.junit.Test;

@@ -1,4 +1,4 @@
-package com.aitho.contocorrente.model;
+package com.aitho.contocorrente.enums;
 
 public enum RoleEnum {
   ROLE_USER,

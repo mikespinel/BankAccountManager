@@ -2,15 +2,10 @@ package com.aitho.contocorrente.service;
 
 import com.aitho.contocorrente.model.BankAccount;
 import com.aitho.contocorrente.model.Customer;
-import com.aitho.contocorrente.model.Role;
-import com.aitho.contocorrente.model.RoleEnum;
 import com.aitho.contocorrente.repository.CustomerRepository;
 import com.aitho.contocorrente.repository.RoleRepository;
 import com.aitho.contocorrente.security.UserDetailsImpl;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,8 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;

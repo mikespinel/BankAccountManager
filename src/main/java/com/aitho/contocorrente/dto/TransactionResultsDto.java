@@ -1,6 +1,6 @@
 package com.aitho.contocorrente.dto;
 
-import com.aitho.contocorrente.model.OperationType;
+import com.aitho.contocorrente.enums.OperationType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

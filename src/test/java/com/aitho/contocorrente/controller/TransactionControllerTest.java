@@ -1,7 +1,7 @@
 package com.aitho.contocorrente.controller;
 
 import com.aitho.contocorrente.dto.TransactionResultsDto;
-import com.aitho.contocorrente.model.OperationType;
+import com.aitho.contocorrente.enums.OperationType;
 import com.aitho.contocorrente.service.TransactionService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

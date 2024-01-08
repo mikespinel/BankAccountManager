@@ -2,6 +2,7 @@ package com.aitho.contocorrente.model;
 
 import javax.persistence.*;
 
+import com.aitho.contocorrente.enums.OperationType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 

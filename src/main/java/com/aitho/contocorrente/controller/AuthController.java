@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.security.Principal;
 import java.text.ParseException;
 
 @RestController
@@ -44,5 +45,12 @@ public class AuthController {
     @PostMapping("/refreshtoken")
     public ResponseEntity<?> refreshtoken(@Valid @RequestBody TokenRefreshRequest tokenRefreshRequest, HttpServletRequest httpServletRequest) throws BadJOSEException, ParseException, JOSEException {
         return service.refreshToken(tokenRefreshRequest, httpServletRequest.getRequestURL().toString());
+    }
+
+    @PostMapping("/signout")
+    public ResponseEntity<?> logoutUser(HttpServletRequest request) {
+        service.deleteRefreshTokenByUsername(request.getUserPrincipal().getName());
+        return ResponseEntity.ok(new MessageResponse("Log out successful!"));
+
     }
 }

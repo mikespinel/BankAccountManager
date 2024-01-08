@@ -1,5 +1,6 @@
 package com.aitho.contocorrente.model;
 
+import com.aitho.contocorrente.enums.RoleEnum;
 import lombok.Getter;
 import lombok.Setter;
 

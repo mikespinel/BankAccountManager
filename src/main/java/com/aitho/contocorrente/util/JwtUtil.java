@@ -22,7 +22,9 @@ import org.springframework.security.core.userdetails.User;
 import java.text.ParseException;
 import java.time.Instant;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -62,11 +64,14 @@ public abstract class JwtUtil {
         }
     }
 
-    public static String createRefreshToken(String username) {
+    public static Map<String, Object> createRefreshToken(String username) {
+        Map<String, Object> map = new HashMap<>();
+        Instant expireDate = Instant.now().plusSeconds(expireHourRefreshToken * 3600);
+        map.put("expiryDate", expireDate);
         try {
             JWTClaimsSet claims = new JWTClaimsSet.Builder()
                     .subject(username)
-                    .expirationTime(Date.from(Instant.now().plusSeconds(expireHourRefreshToken * 3600)))
+                    .expirationTime(Date.from(expireDate))
                     .build();
 
             Payload payload = new Payload(claims.toJSONObject());
@@ -75,7 +80,8 @@ public abstract class JwtUtil {
                     payload);
 
             jwsObject.sign(new MACSigner(SECRET));
-            return jwsObject.serialize();
+            map.put("refreshToken", jwsObject.serialize());
+            return map;
         }
         catch (JOSEException e) {
             throw new RuntimeException("Error to create JWT", e);

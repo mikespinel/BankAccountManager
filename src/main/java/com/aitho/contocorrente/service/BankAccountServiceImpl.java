@@ -2,7 +2,7 @@ package com.aitho.contocorrente.service;
 
 import com.aitho.contocorrente.exception.BankAccountException;
 import com.aitho.contocorrente.model.BankAccount;
-import com.aitho.contocorrente.model.OperationType;
+import com.aitho.contocorrente.enums.OperationType;
 import com.aitho.contocorrente.repository.BankAccountRepository;
 import org.springframework.stereotype.Service;
 

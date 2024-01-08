@@ -4,7 +4,7 @@ import com.aitho.contocorrente.dto.TransactionResultsDto;
 import com.aitho.contocorrente.mapper.TransactionMapper;
 import com.aitho.contocorrente.model.BankAccount;
 import com.aitho.contocorrente.model.Customer;
-import com.aitho.contocorrente.model.OperationType;
+import com.aitho.contocorrente.enums.OperationType;
 import com.aitho.contocorrente.model.Transaction;
 import com.aitho.contocorrente.repository.TransactionRepository;
 import org.junit.Before;

@@ -2,7 +2,7 @@ package com.aitho.contocorrente.service;
 
 import com.aitho.contocorrente.dto.TransactionResultsDto;
 import com.aitho.contocorrente.model.BankAccount;
-import com.aitho.contocorrente.model.OperationType;
+import com.aitho.contocorrente.enums.OperationType;
 
 import java.util.List;
 

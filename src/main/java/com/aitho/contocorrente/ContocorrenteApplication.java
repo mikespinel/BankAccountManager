@@ -2,7 +2,7 @@ package com.aitho.contocorrente;
 
 import com.aitho.contocorrente.model.Customer;
 import com.aitho.contocorrente.model.Role;
-import com.aitho.contocorrente.model.RoleEnum;
+import com.aitho.contocorrente.enums.RoleEnum;
 import com.aitho.contocorrente.repository.RoleRepository;
 import com.aitho.contocorrente.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
