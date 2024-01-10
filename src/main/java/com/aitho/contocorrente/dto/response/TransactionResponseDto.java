@@ -1,14 +1,16 @@
-package com.aitho.contocorrente.dto;
+package com.aitho.contocorrente.dto.response;
 
 import com.aitho.contocorrente.enums.OperationType;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Date;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
-public class TransactionResultsDto {
+public class TransactionResponseDto {
 
     private Long id;
     private Double amount;

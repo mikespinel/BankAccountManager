@@ -11,6 +11,7 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class BankAccount {
 
     @Id
@@ -25,13 +26,9 @@ public class BankAccount {
 
     @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)
-    //@ToString.Exclude
     private Customer customer;
 
-    //@Transient
     @OneToMany(mappedBy = "bankAccount")
-    //@ToString.Exclude
     private Set<Transaction> transactions;
-
 
 }

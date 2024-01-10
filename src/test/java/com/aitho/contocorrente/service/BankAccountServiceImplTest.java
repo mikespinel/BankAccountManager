@@ -2,57 +2,63 @@ package com.aitho.contocorrente.service;
 
 import com.aitho.contocorrente.model.BankAccount;
 import com.aitho.contocorrente.model.Customer;
-import com.aitho.contocorrente.enums.OperationType;
 import com.aitho.contocorrente.repository.BankAccountRepository;
-import org.junit.Ignore;
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.HashSet;
+import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
 
-@ExtendWith(value = MockitoExtension.class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class BankAccountServiceImplTest {
-
-    @Mock
-    private BankAccountRepository repository;
-
-    @Mock
-    private TransactionServiceImpl transactionService;
+@RunWith(MockitoJUnitRunner.class)
+public class BankAccountServiceImplTest {
 
     @InjectMocks
-    private BankAccountServiceImpl service;
-    @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
+    BankAccountServiceImpl bankAccountService;
+
+    @Mock
+    BankAccountRepository bankAccountRepository;
+
+    @Mock
+    TransactionServiceImpl transactionService;
 
     @Test
-    @Ignore
     @DisplayName("Test doCreditSuccess Success")
-    void doCreditSuccessTest(){
+    public void doCreditSuccessTest() {
         Double initialBalance = 1000.00;
         Double amount = 50.00;
 
-        //Setup our mock repository
-        Customer customer = new Customer(10L, "Giacomo", "Leopardi", "90082020638", "1234", new HashSet<>());
-        BankAccount bankAccount = new BankAccount(7L, initialBalance, 10L, customer, new HashSet<>());
-        doReturn(bankAccount).when(repository).getReferenceById(bankAccount.getId());
-        doReturn(bankAccount).when(repository).save(bankAccount);
-        doNothing().when(transactionService).create(bankAccount, amount, OperationType.CREDIT);
+        Customer customer = Customer.builder()
+                .firstName("Giacomo")
+                .lastName("Leopardi")
+                .taxCode("90082020638")
+                .username("giacomol")
+                .email("giacomo@email.com")
+                .password("123456789")
+                .build();
 
-        //Execute service call
-        service.doCredit("90082020638", 1L, amount);
+        BankAccount bankAccount = new BankAccount(1L, initialBalance, 1L, customer, new HashSet<>());
 
-        // Assert the response
-        Assertions.assertEquals(initialBalance + amount, bankAccount.getBalance(), "The balance was not incremented");
+        when(bankAccountRepository.findById(any())).thenReturn(Optional.of(bankAccount));
+        when(bankAccountRepository.getReferenceById(any())).thenReturn(bankAccount);
+        when(bankAccountRepository.save(any())).thenReturn(bankAccount);
+        when(transactionService.create(any(), any(), any())).thenReturn(null);
+
+        Double balance = bankAccountService.getBalance(customer.getUsername(), bankAccount.getId());
+
+        assertEquals(1000.00, balance);
+        bankAccountService.doCredit(customer.getUsername(), bankAccount.getId(), amount);
+        balance = bankAccountService.getBalance(customer.getUsername(), bankAccount.getId());
+        assertEquals(1050.00, balance);
 
     }
+
 }

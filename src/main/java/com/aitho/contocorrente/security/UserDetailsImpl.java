@@ -2,9 +2,7 @@ package com.aitho.contocorrente.security;
 
 import com.aitho.contocorrente.model.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -24,6 +22,7 @@ public class UserDetailsImpl implements UserDetails {
 
 	private String username;
 
+	@Getter
 	private String email;
 
 	@JsonIgnore
@@ -33,6 +32,7 @@ public class UserDetailsImpl implements UserDetails {
 
 	public UserDetailsImpl(String username, String email, String password,
 						   Collection<? extends GrantedAuthority> authorities) {
+		super();
 		this.username = username;
 		this.email = email;
 		this.password = password;
@@ -56,10 +56,6 @@ public class UserDetailsImpl implements UserDetails {
 		return authorities;
 	}
 
-
-	public String getEmail() {
-		return email;
-	}
 
 	@Override
 	public String getPassword() {
@@ -100,4 +96,6 @@ public class UserDetailsImpl implements UserDetails {
 		UserDetailsImpl user = (UserDetailsImpl) o;
 		return Objects.equals(username, user.username);
 	}
+
+
 }

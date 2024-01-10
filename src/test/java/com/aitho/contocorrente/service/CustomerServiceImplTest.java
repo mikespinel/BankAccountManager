@@ -1,58 +1,51 @@
 package com.aitho.contocorrente.service;
 
-import com.aitho.contocorrente.mapper.CustomerMapper;
 import com.aitho.contocorrente.model.BankAccount;
 import com.aitho.contocorrente.model.Customer;
 import com.aitho.contocorrente.repository.CustomerRepository;
-import org.junit.Before;
+import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.HashSet;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
-@ExtendWith(value = MockitoExtension.class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class CustomerServiceImplTest {
+@RunWith(MockitoJUnitRunner.class)
+public class CustomerServiceImplTest {
+
+    @InjectMocks
+    private CustomerServiceImpl customerService;
 
     @Mock
     private CustomerRepository repository;
 
-    @Mock
-    private CustomerMapper mapper;
-
-    @InjectMocks
-    private CustomerServiceImpl service;
-    @Before
-    public void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
-
     @Test
     @DisplayName("Test getBankAccountList Success")
-    void testGetBankAccountList(){
-        // Setup our mock repository
-        Customer customer = new Customer(10L, "Giacomo", "Leopardi", "90082020638", "1234", new HashSet<>());
+    public void testGetBankAccountList(){
+        Customer customer = Customer.builder()
+                .firstName("Giacomo")
+                .lastName("Leopardi")
+                .taxCode("90082020638")
+                .username("giacomol")
+                .email("giacomo@email.com")
+                .password("123456789")
+                .build();
         BankAccount bankAccount = new BankAccount(7L, 1000.00, 10L, customer, new HashSet<>());
+        customer.setBankAccounts(new HashSet<>());
         customer.getBankAccounts().add(bankAccount);
 
-        doReturn(true).when(repository).existsById(10L);
-        doReturn(customer).when(repository).selectCustomerJoinBankAccount(10L);
+        doReturn(true).when(repository).existsById(any());
+        doReturn(customer).when(repository).selectCustomerJoinBankAccount(any());
 
-        // Execute the service call
-        List<Long> returnedList = service.getBankAccountList(10L);
+        List<Long> returnedList = customerService.getBankAccountList(1L);
 
-        // Assert the response
-        //Assertions.assertTrue(returnedList.isPresent(), "Customer was not found");
         Assertions.assertNotNull(returnedList, "Customer was not found");
         Assertions.assertSame(7L, returnedList.get(0), "The customer returned was not the same as the mock");
     }

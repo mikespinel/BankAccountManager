@@ -3,7 +3,6 @@ package com.aitho.contocorrente.service;
 import com.aitho.contocorrente.model.BankAccount;
 import com.aitho.contocorrente.model.Customer;
 import com.aitho.contocorrente.repository.CustomerRepository;
-import com.aitho.contocorrente.repository.RoleRepository;
 import com.aitho.contocorrente.security.UserDetailsImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -23,30 +22,52 @@ public class CustomerServiceImpl implements CustomerService, UserDetailsService 
 
     private final CustomerRepository repository;
     private final PasswordEncoder passwordEncoder;
-    private final RoleRepository roleRepository;
 
-    private static final String USER_NOT_FOUND_MESSAGE = "Utente con codice fiscale %s non trovato";
+    private static final String USERNAME_NOT_FOUND_MESSAGE = "Utente con username %s non trovato";
+    private static final String USER_ID_NOT_FOUND_MESSAGE = "Utente con id %s non trovato";
 
-
-    public CustomerServiceImpl(CustomerRepository repository, PasswordEncoder passwordEncoder, RoleRepository roleRepository) {
+    public CustomerServiceImpl(CustomerRepository repository, PasswordEncoder passwordEncoder) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
-        this.roleRepository = roleRepository;
     }
 
     @Override
     public List<Long> getBankAccountList(Long customerId) {
+        log.info("Getting bank account ids for customer with id {}", customerId);
         List<Long> bankAccounts;
-        if(repository.existsById(customerId)){
-            //funziona ma durante il debug i valori sono null, ma se fai un evaluate del getter del campo il valore c'e'
-            //Customer customer = repository.getReferenceById(customerId);
 
-            Customer customer = repository.selectCustomerJoinBankAccount(customerId);
-            bankAccounts = customer.getBankAccounts().stream().map(BankAccount::getId).collect(Collectors.toList());
-            return bankAccounts;
-        }else{
-            throw new EntityNotFoundException("Impossibile trovare utente con id " + customerId);
+        if(!repository.existsById(customerId))
+            throw new EntityNotFoundException(String.format(USER_ID_NOT_FOUND_MESSAGE, customerId));
+
+        Customer customer = repository.selectCustomerJoinBankAccount(customerId);
+        bankAccounts = customer.getBankAccounts().stream().map(BankAccount::getId).collect(Collectors.toList());
+
+        return bankAccounts;
+
+    }
+
+    @Override
+    public Customer getById(Long id){
+        log.info("loading user with id {}", id);
+        Optional<Customer> optionalCustomer = repository.findById(id);
+        if(!optionalCustomer.isPresent()) {
+            String message = String.format(USER_ID_NOT_FOUND_MESSAGE, id);
+            log.error(message);
+            throw new EntityNotFoundException(message);
         }
+        return optionalCustomer.get();
+    }
+
+    @Override
+    public Customer getByUsername(String username){
+        log.info("loading user with username {}", username);
+        Optional<Customer> optionalCustomer = repository.findByUsername(username);
+        if(!optionalCustomer.isPresent()) {
+            String message = String.format(USERNAME_NOT_FOUND_MESSAGE, username);
+            log.error(message);
+            throw new UsernameNotFoundException(message);
+        }
+        return optionalCustomer.get();
     }
 
     @Override
@@ -57,23 +78,15 @@ public class CustomerServiceImpl implements CustomerService, UserDetailsService 
     @Transactional(readOnly = true)
     @Override
     public UserDetailsImpl loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<Customer> optionalCustomer = repository.findByUsername(username);
-        if(!optionalCustomer.isPresent()) {
-            String message = String.format(USER_NOT_FOUND_MESSAGE, username);
-            log.error(message);
-            throw new UsernameNotFoundException(message);
-        } else {
-            log.debug("User found in the database: {}", username);
-            Customer customer = optionalCustomer.get();
-            /*customer.getRoles().add(roleRepository.findByName(RoleEnum.ROLE_USER)
-                    .orElseThrow(() -> new RuntimeException("Error: Role is not found.")));*/
-            return UserDetailsImpl.build(customer);
-        }
+        Customer customer = getByUsername(username);
+        log.debug("User found in the database: {}", username);
+        return UserDetailsImpl.build(customer);
     }
 
     @Override
+    @Transactional
     public Customer save(Customer customer) {
-        log.info("Saving user {} to the database", customer.getTaxCode());
+        log.info("Saving user {} to the database", customer.getUsername());
         customer.setPassword(passwordEncoder.encode(customer.getPassword()));
         return repository.save(customer);
     }

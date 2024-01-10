@@ -1,15 +1,19 @@
 package com.aitho.contocorrente.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @MappedSuperclass
+@NoArgsConstructor
+@SuperBuilder
 public abstract class User {
 
     @Column(name = "username", nullable = false, unique = true)

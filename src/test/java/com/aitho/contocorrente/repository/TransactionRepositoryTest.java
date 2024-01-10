@@ -1,10 +1,10 @@
 package com.aitho.contocorrente.repository;
 
 import com.aitho.contocorrente.ContocorrenteJpaConfig;
-import com.aitho.contocorrente.model.BankAccount;
 import com.aitho.contocorrente.enums.OperationType;
-import com.aitho.contocorrente.model.Transaction;
+import com.aitho.contocorrente.model.BankAccount;
 import com.aitho.contocorrente.model.Customer;
+import com.aitho.contocorrente.model.Transaction;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -31,8 +31,25 @@ public class TransactionRepositoryTest {
     @Test
     public void givenTransaction_whenSave_thenGetOk() {
 
-        Customer customer = new Customer(1L, "Clara", "Spinello", "SPNCLR0200000", new HashSet<>());
-        Customer customer2 = new Customer(2L, "Danilo", "Spinello", "SPNDNL9200000", new HashSet<>());
+        Customer customer = Customer.builder()
+                .firstName("Clara")
+                .lastName("Spinello")
+                .taxCode("SPNCLR0200000")
+                .username("claras")
+                .email("clara@email.com")
+                .password("123456789")
+                .build();
+        Customer customer2 = Customer.builder()
+                .firstName("Danilo")
+                .lastName("Spinello")
+                .taxCode("SPNDNL9200000")
+                .username("danilos")
+                .email("danilo@email.com")
+                .password("123456789")
+                .build();
+
+        customer.setId(1L);
+        customer2.setId(2L);
 
         BankAccount bankAccount = new BankAccount(1L, 3000.00, customer.getId(), customer, new HashSet<>());
         BankAccount bankAccount2 = new BankAccount(2L, 4000.00, customer2.getId(), customer2, new HashSet<>());
@@ -44,7 +61,11 @@ public class TransactionRepositoryTest {
         repository.save(transaction2);
 
         Transaction transactionAssert = repository.getReferenceById(1L);
+        Transaction transactionAssert2 = repository.getReferenceById(2L);
+
         assertEquals((Double)50.00, transactionAssert.getAmount());
+        assertEquals((Double)20.00, transactionAssert2.getAmount());
+
     }
 
 }

@@ -1,27 +1,30 @@
 package com.aitho.contocorrente.service;
 
-import com.aitho.contocorrente.dto.TransactionResultsDto;
+import com.aitho.contocorrente.dto.response.TransactionResponseDto;
+import com.aitho.contocorrente.enums.OperationType;
 import com.aitho.contocorrente.mapper.TransactionMapper;
 import com.aitho.contocorrente.model.BankAccount;
 import com.aitho.contocorrente.model.Customer;
-import com.aitho.contocorrente.enums.OperationType;
 import com.aitho.contocorrente.model.Transaction;
 import com.aitho.contocorrente.repository.TransactionRepository;
-import org.junit.Before;
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.*;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
-@ExtendWith(value = MockitoExtension.class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class TransactionServiceImplTest {
+@RunWith(MockitoJUnitRunner.class)
+public class TransactionServiceImplTest {
+
+    @InjectMocks
+    private TransactionServiceImpl service;
 
     @Mock
     private TransactionRepository repository;
@@ -29,36 +32,30 @@ class TransactionServiceImplTest {
     @Mock
     private TransactionMapper mapper;
 
-    @InjectMocks
-    private TransactionServiceImpl service;
-    @Before
-    public void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
-
     @Test
     @DisplayName("Test getLastMovements Success")
-    void testGetLastMovementsSuccess(){
-        // Setup our mock repository
-        Long bankAccountId = 7L;
-        Long customerId = 10L;
-        List<Transaction> transactions = getTransactionResultsDtos() ;
-        doReturn(transactions).when(repository).getLastMovements(bankAccountId);
-        //doReturn(getTransactionResultsDtos()).when(mapper).toResultsDtos();
-        doReturn(toDto(transactions)).when(mapper).toResultsDtos(transactions);
+    public void testGetLastMovementsSuccess(){
+        List<Transaction> transactions = getTransactionResponseDtos() ;
+        doReturn(transactions).when(repository).getLastMovements(any());
+        doReturn(getTransactionResponseDtos()).when(mapper).toResponseDtos(transactions);
+        doReturn(toDto(transactions)).when(mapper).toResponseDtos(transactions);
 
-        // Execute the service call
-        List<TransactionResultsDto> transactionResultsDtos = service.getLastMovements(bankAccountId);
+        List<TransactionResponseDto> transactionResponseDtos = service.getLastMovements(1L);
 
-        // Assert the response
-        Assertions.assertNotNull(transactionResultsDtos, "Transactions was not found");
-        Assertions.assertSame(5, transactionResultsDtos.size(), "The number of transaction expected is 5");
+        Assertions.assertNotNull(transactionResponseDtos, "Transactions was not found");
+        Assertions.assertSame(5, transactionResponseDtos.size(), "The number of transaction expected is 5");
 
     }
 
-    private static List<Transaction> getTransactionResultsDtos() {
-        Customer customer = new Customer(1L, "Clara", "Spinello", "SPNCLR0200000", new HashSet<>());
-
+    private static List<Transaction> getTransactionResponseDtos() {
+        Customer customer = Customer.builder()
+                .firstName("Clara")
+                .lastName("Spinello")
+                .taxCode("SPNCLR0200000")
+                .username("claras")
+                .email("clara@email.com")
+                .password("123456789")
+                .build();
         BankAccount bankAccount = new BankAccount(null, 3000.00, customer.getId(), customer, new HashSet<>());
 
         Transaction transaction1 = new Transaction(1L, 50.00, OperationType.CREDIT, new Date(), bankAccount);
@@ -70,10 +67,10 @@ class TransactionServiceImplTest {
         return Arrays.asList(transaction1, transaction2, transaction3, transaction4, transaction5);
     }
 
-    private static List<TransactionResultsDto> toDto(List<Transaction> transactions) {
-        List<TransactionResultsDto> resultsDtos = new ArrayList<>();
+    private static List<TransactionResponseDto> toDto(List<Transaction> transactions) {
+        List<TransactionResponseDto> resultsDtos = new ArrayList<>();
         transactions.forEach(t -> {
-            resultsDtos.add(new TransactionResultsDto(
+            resultsDtos.add(new TransactionResponseDto(
                     t.getId(),
                     t.getAmount(),
                     t.getOperationType(),

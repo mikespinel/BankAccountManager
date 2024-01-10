@@ -1,31 +1,24 @@
 package com.aitho.contocorrente.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+
 import javax.persistence.*;
-
-import com.fasterxml.jackson.annotation.*;
-import lombok.*;
-
 import java.util.Set;
 
 @Table(name = "customer")
 @Entity
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@SuperBuilder
 public class Customer extends User{
 
-    public Customer(String firstName, String lastName, String taxCode, String username, String email, String password){
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.taxCode = taxCode;
-        super.setUsername(username);
-        super.setEmail(email);
-        super.setPassword(password);
-    }
-
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "first_name", nullable = false)
@@ -37,11 +30,8 @@ public class Customer extends User{
     @Column(name = "tax_code", unique = true)
     private String taxCode;
 
-    //@Transient
     @OneToMany(mappedBy = "customer")
     @JsonIgnoreProperties("transactions")
-    //@ToString.Exclude
     private Set<BankAccount> bankAccounts;
-
 
 }

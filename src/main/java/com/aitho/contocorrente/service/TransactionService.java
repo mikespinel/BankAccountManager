@@ -1,14 +1,14 @@
 package com.aitho.contocorrente.service;
 
-import com.aitho.contocorrente.dto.TransactionResultsDto;
-import com.aitho.contocorrente.model.BankAccount;
+import com.aitho.contocorrente.dto.response.TransactionResponseDto;
 import com.aitho.contocorrente.enums.OperationType;
+import com.aitho.contocorrente.model.BankAccount;
 
 import java.util.List;
 
 public interface TransactionService {
 
-    List<TransactionResultsDto> getLastMovements(Long bankAccountId);
+    List<TransactionResponseDto> getLastMovements(Long bankAccountId);
 
-    void create(BankAccount bankAccount, Double amount, OperationType operationType);
+    TransactionResponseDto create(BankAccount bankAccount, Double amount, OperationType operationType);
 }

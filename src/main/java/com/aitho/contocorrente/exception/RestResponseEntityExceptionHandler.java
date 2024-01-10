@@ -3,6 +3,7 @@ package com.aitho.contocorrente.exception;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -34,15 +35,15 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         return handleExceptionInternal(ex, errors, headers, status, request);
     }
 
-    @ExceptionHandler(value = {EntityNotFoundException.class})
+    @ExceptionHandler(value = {EntityNotFoundException.class, UsernameNotFoundException.class})
     protected ResponseEntity<Object> handleEntityNotFound(RuntimeException ex, WebRequest request){
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(value = {BankAccountException.class})
-    protected ResponseEntity<Object> handleBankAccountErr(RuntimeException ex, WebRequest request){
+    @ExceptionHandler(value = {BankAccountException.class, RegisterCustomerException.class})
+    protected ResponseEntity<Object> handleInputErr(RuntimeException ex, WebRequest request){
         String bodyOfResponse = ex.getMessage();
-        return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
+        return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
 }

@@ -1,7 +1,6 @@
 package com.aitho.contocorrente.controller;
 
 import com.aitho.contocorrente.service.CustomerService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,9 +22,6 @@ public class CustomerController {
     @GetMapping(value = "/bank-accounts/{customerId}")
     public ResponseEntity<List<Long>> getBankAccounts(@PathVariable Long customerId){
         List<Long> bankAccountsList = service.getBankAccountList(customerId);
-        if(!bankAccountsList.isEmpty())
-            return new ResponseEntity<>(bankAccountsList, HttpStatus.OK);
-        else
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return ResponseEntity.ok().body(bankAccountsList);
     }
 }

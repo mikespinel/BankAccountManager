@@ -24,7 +24,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private static final String[] AUTH_WHITELIST = {
-            "/login/**",
             "/swagger-resources/**",
             "/swagger-ui.html",
             "/v2/api-docs",
@@ -44,8 +43,8 @@ public class SecurityConfig {
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .authorizeHttpRequests((authz) -> authz
-                        .antMatchers(HttpMethod.POST, "/users/**").hasAuthority("ROLE_ADMIN")
+                .authorizeHttpRequests(authz -> authz
+                        .antMatchers(HttpMethod.POST, "/bank-accounts/open").hasAuthority("ROLE_ADMIN")
                         .antMatchers(AUTH_WHITELIST).permitAll()
                         .anyRequest().authenticated()
                 )

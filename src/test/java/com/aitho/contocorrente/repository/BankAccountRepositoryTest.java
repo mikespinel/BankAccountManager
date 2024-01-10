@@ -27,9 +27,25 @@ public class BankAccountRepositoryTest {
 
     @Test
     public void givenBankAccount_whenSave_thenGetOk() {
+        Customer customer = Customer.builder()
+                .firstName("Clara")
+                .lastName("Spinello")
+                .taxCode("SPNCLR0200000")
+                .username("claras")
+                .email("clara@email.com")
+                .password("123456789")
+                .build();
+        Customer customer2 = Customer.builder()
+                .firstName("Danilo")
+                .lastName("Spinello")
+                .taxCode("SPNDNL9200000")
+                .username("danilos")
+                .email("danilo@email.com")
+                .password("123456789")
+                .build();
 
-        Customer customer = new Customer(1L, "Clara", "Spinello", "SPNCLR0200000", new HashSet<>());
-        Customer customer2 = new Customer(2L, "Danilo", "Spinello", "SPNDNL9200000", new HashSet<>());
+        customer.setId(1L);
+        customer2.setId(2L);
 
         BankAccount bankAccount = new BankAccount(null, 3000.00, customer.getId(), customer, new HashSet<>());
         BankAccount bankAccount2 = new BankAccount(null, 4000.00, customer2.getId(), customer2, new HashSet<>());
@@ -37,8 +53,12 @@ public class BankAccountRepositoryTest {
         repository.save(bankAccount);
         repository.save(bankAccount2);
 
-        BankAccount bankAccountAssert = repository.getReferenceById(2L);
-        assertEquals((Double)4000.00, bankAccountAssert.getBalance());
+        BankAccount bankAccountAssert = repository.getReferenceById(1L);
+        BankAccount bankAccountAssert2 = repository.getReferenceById(2L);
+
+        assertEquals((Double)3000.00, bankAccountAssert.getBalance());
+        assertEquals((Double)4000.00, bankAccountAssert2.getBalance());
+
     }
 
 }

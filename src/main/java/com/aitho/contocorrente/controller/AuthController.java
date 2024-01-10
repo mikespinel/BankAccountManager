@@ -1,10 +1,12 @@
 package com.aitho.contocorrente.controller;
 
-import com.aitho.contocorrente.dto.request.LoginRequest;
-import com.aitho.contocorrente.dto.request.SignupRequest;
-import com.aitho.contocorrente.dto.request.TokenRefreshRequest;
-import com.aitho.contocorrente.dto.response.JwtResponse;
-import com.aitho.contocorrente.dto.response.MessageResponse;
+import com.aitho.contocorrente.dto.request.LoginRequestDto;
+import com.aitho.contocorrente.dto.request.SignupRequestDto;
+import com.aitho.contocorrente.dto.request.TokenRefreshRequestDto;
+import com.aitho.contocorrente.dto.response.CustomerResponseDto;
+import com.aitho.contocorrente.dto.response.JwtResponseDto;
+import com.aitho.contocorrente.dto.response.MessageResponseDto;
+import com.aitho.contocorrente.dto.response.TokenRefreshResponseDto;
 import com.aitho.contocorrente.service.AuthService;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.proc.BadJOSEException;
@@ -16,41 +18,40 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.security.Principal;
 import java.text.ParseException;
 
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
 
-
     private final AuthService service;
 
     public AuthController(AuthService service) {
-
         this.service = service;
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest, HttpServletRequest httpServletRequest) {
-        JwtResponse response = service.signin(loginRequest, httpServletRequest);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<JwtResponseDto> authenticateUser(@Valid @RequestBody LoginRequestDto loginRequestDto, HttpServletRequest httpServletRequest) {
+        JwtResponseDto response = service.signin(loginRequestDto, httpServletRequest);
+        return ResponseEntity.ok().body(response);
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
-        return service.registerCustomer(signUpRequest);
+    public ResponseEntity<CustomerResponseDto> registerUser(@Valid @RequestBody SignupRequestDto signUpRequestDto) {
+        CustomerResponseDto responseDto = service.registerCustomer(signUpRequestDto);
+        return ResponseEntity.ok().body(responseDto);
     }
 
     @PostMapping("/refreshtoken")
-    public ResponseEntity<?> refreshtoken(@Valid @RequestBody TokenRefreshRequest tokenRefreshRequest, HttpServletRequest httpServletRequest) throws BadJOSEException, ParseException, JOSEException {
-        return service.refreshToken(tokenRefreshRequest, httpServletRequest.getRequestURL().toString());
+    public ResponseEntity<TokenRefreshResponseDto> refreshtoken(@Valid @RequestBody TokenRefreshRequestDto tokenRefreshRequestDto, HttpServletRequest httpServletRequest) throws BadJOSEException, ParseException, JOSEException {
+        TokenRefreshResponseDto responseDto = service.refreshToken(tokenRefreshRequestDto, httpServletRequest.getRequestURL().toString());
+        return ResponseEntity.ok().body(responseDto);
     }
 
     @PostMapping("/signout")
-    public ResponseEntity<?> logoutUser(HttpServletRequest request) {
+    public ResponseEntity<MessageResponseDto> logoutUser(HttpServletRequest request) {
         service.deleteRefreshTokenByUsername(request.getUserPrincipal().getName());
-        return ResponseEntity.ok(new MessageResponse("Log out successful!"));
+        return ResponseEntity.ok(new MessageResponseDto("Log out successful!"));
 
     }
 }

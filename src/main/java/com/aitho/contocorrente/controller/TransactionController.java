@@ -1,10 +1,12 @@
 package com.aitho.contocorrente.controller;
 
-import com.aitho.contocorrente.dto.TransactionResultsDto;
+import com.aitho.contocorrente.dto.response.TransactionResponseDto;
 import com.aitho.contocorrente.service.TransactionService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -19,8 +21,8 @@ public class TransactionController {
     }
 
     @GetMapping(value = "/history/{accountId}")
-    public ResponseEntity<List<TransactionResultsDto>> history(@PathVariable Long accountId){
-        List<TransactionResultsDto> transactions = service.getLastMovements(accountId);
-        return new ResponseEntity<>(transactions, HttpStatus.OK);
+    public ResponseEntity<List<TransactionResponseDto>> history(@PathVariable Long accountId){
+        List<TransactionResponseDto> transactions = service.getLastMovements(accountId);
+        return ResponseEntity.ok().body(transactions);
     }
 }

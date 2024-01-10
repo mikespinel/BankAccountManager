@@ -3,6 +3,9 @@ CREATE TABLE IF NOT EXISTS customer (
 	first_name varchar(255) NOT NULL,
 	last_name varchar(255) NOT NULL,
 	tax_code varchar(255) NULL,
+	"password" varchar NOT NULL,
+    username varchar NOT NULL,
+    email varchar NOT NULL,
 	CONSTRAINT customer_pkey PRIMARY KEY (id)
 );
 

@@ -26,9 +26,24 @@ public class CustomerRepositoryTest {
 
     @Test
     public void givenCustomer_whenSave_thenGetOk() {
-        Customer customer = new Customer(null, "Clara", "Spinello", "SPNCLR0200000", new HashSet<>());
-        Customer customer2 = new Customer(null, "Danilo", "Spinello", "SPNDNL9200000", new HashSet<>());
-
+        Customer customer = Customer.builder()
+                .firstName("Clara")
+                .lastName("Spinello")
+                .taxCode("SPNCLR0200000")
+                .username("claras")
+                .email("clara@email.com")
+                .password("123456789")
+                .build();
+        Customer customer2 = Customer.builder()
+                .firstName("Danilo")
+                .lastName("Spinello")
+                .taxCode("SPNDNL9200000")
+                .username("danilos")
+                .email("danilo@email.com")
+                .password("123456789")
+                .build();
+        customer.setBankAccounts(new HashSet<>());
+        customer2.setBankAccounts(new HashSet<>());
         repository.save(customer);
         repository.save(customer2);
 

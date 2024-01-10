@@ -33,7 +33,6 @@ public class Transaction {
 
     @ManyToOne
     @JoinColumn(name = "bank_account_id", nullable = false)
-    //@ToString.Exclude
     @JsonIgnoreProperties({"customer", "transactions", "balance"})
     private BankAccount bankAccount;
 }
